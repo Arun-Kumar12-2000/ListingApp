@@ -44,6 +44,8 @@ class MainActivity : AppCompatActivity() {
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
     private lateinit var networkReceiver: NetworkChangeReceiver
+    private var isUserSearching = false
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,7 +92,7 @@ class MainActivity : AppCompatActivity() {
                 super.onScrolled(recyclerView, dx, dy)
 
 
-                if (!isLoading) {
+                if (!isLoading && !isUserSearching) { // Prevent pagination during search
                     val layoutManager = recyclerView.layoutManager as StaggeredGridLayoutManager
                     val lastVisibleItemPositions = layoutManager.findLastVisibleItemPositions(null)
                     val lastVisibleItemPosition = lastVisibleItemPositions.maxOrNull() ?: 0
@@ -110,6 +112,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onTextChanged(charSequence: CharSequence, start: Int, before: Int, count: Int) {
+                isUserSearching = !charSequence.isNullOrEmpty()
                 charSequence?.let {
                     viewModel.searchUsers(it.toString()) // Call the search function when text changes
                 }
