@@ -1,6 +1,7 @@
 package com.example.task
 
 import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.content.Context
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.location.Location
@@ -11,6 +12,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -92,7 +94,7 @@ class MainActivity : AppCompatActivity() {
                 super.onScrolled(recyclerView, dx, dy)
 
 
-                if (!isLoading && !isUserSearching) { // Prevent pagination during search
+                if (!isLoading && !isUserSearching) {
                     val layoutManager = recyclerView.layoutManager as StaggeredGridLayoutManager
                     val lastVisibleItemPositions = layoutManager.findLastVisibleItemPositions(null)
                     val lastVisibleItemPosition = lastVisibleItemPositions.maxOrNull() ?: 0
@@ -125,24 +127,8 @@ class MainActivity : AppCompatActivity() {
 
         binding.cancelIcon.setOnClickListener {
             binding.searchEditText.setText("")
+            hideKeyboard(binding.searchEditText) // Hide keyboard
         }
-
-
-        /*binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                query?.let {
-                    viewModel.searchUsers(it)
-                }
-                return true
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                newText?.let {
-                    viewModel.searchUsers(it)
-                }
-                return true
-            }
-        })*/
 
         viewModel.users.observe(this) { users ->
             adapter.setUsers(users)
@@ -252,5 +238,11 @@ class MainActivity : AppCompatActivity() {
         )
 
     }
+
+    fun hideKeyboard(view: View) {
+        val imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
 
 }
