@@ -2,12 +2,15 @@ package com.example.task
 
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.Context
+import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.location.Location
 import android.net.ConnectivityManager
+import android.net.Uri
 import android.os.Bundle
 import android.os.Looper
+import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -17,6 +20,7 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
@@ -98,8 +102,7 @@ class MainActivity : AppCompatActivity() {
                     val layoutManager = recyclerView.layoutManager as StaggeredGridLayoutManager
                     val lastVisibleItemPositions = layoutManager.findLastVisibleItemPositions(null)
                     val lastVisibleItemPosition = lastVisibleItemPositions.maxOrNull() ?: 0
-
-                    if (lastVisibleItemPosition >= adapter.itemCount - 5) { // Load more when 5 items remain
+                    if (lastVisibleItemPosition >= adapter.itemCount - 5) {
                         showLoadMoreProgress(true)
                         totalResults += pageSize // Increase limit
                         loadData()
@@ -141,11 +144,17 @@ class MainActivity : AppCompatActivity() {
             if (isGranted) {
                 getCurrentLocation()
             } else {
-                Toast.makeText(this, "Permission Denied!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Permission Must need!", Toast.LENGTH_SHORT).show()
+               // showPermissionExplanationDialog()
             }
         }
 
-        checkLocationPermission() //for Location Permission
+        if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            checkLocationPermission() //for Location Permission
+            loadData()
+        }else{
+            getCurrentLocation()
+        }
     }
 
     private fun loadData() {
@@ -209,7 +218,6 @@ class MainActivity : AppCompatActivity() {
                     longitude = it.longitude
                     getweatherApi()
                     Log.d("LocationLat&lng", "Lat: $latitude, Lng: $longitude")
-
                     // Stop updates after getting location
                     fusedLocationClient.removeLocationUpdates(this)
                 } ?: Log.e("Location", "Failed to get location")
@@ -244,5 +252,26 @@ class MainActivity : AppCompatActivity() {
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
+    private fun showPermissionExplanationDialog() {
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Location Permission Needed")
+            .setMessage("This app requires location access to show nearby results. Please enable location permission in settings.")
+            .setPositiveButton("Go to Settings") { _, _ ->
+                // Open app settings for the user to manually enable location permission
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                val uri: Uri = Uri.fromParts("package", packageName, null)
+                intent.data = uri
+                startActivity(intent)
+            }
+            .setCancelable(false)
+            .create()
+
+        dialog.show()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        checkLocationPermission()
+    }
 
 }

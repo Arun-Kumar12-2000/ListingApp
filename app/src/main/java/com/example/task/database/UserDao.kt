@@ -14,9 +14,6 @@ interface UserDao {
     @Query("SELECT * FROM users WHERE firstName LIKE :query || '%' OR lastName LIKE :query || '%'")
     suspend fun searchUsers(query: String): List<UserTable>
 
-    @Query("SELECT * FROM users")
-    suspend fun getAllUsers(): List<UserTable>
-
     @Query("SELECT * FROM users LIMIT :limit")
     suspend fun getPaginatedUsers(limit: Int): List<UserTable>
 

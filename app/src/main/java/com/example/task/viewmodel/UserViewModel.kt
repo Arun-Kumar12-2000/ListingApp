@@ -24,7 +24,7 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
     fun searchUsers(query: String) {
         viewModelScope.launch {
             val filteredUsers = userDao.searchUsers(query)
-            Log.d("SearchDebug", "Filtered Users: $filteredUsers")  // Debugging
+            Log.d("SearchDebug", "Filtered Users: $filteredUsers")  // for my Debugging
             _users.postValue(filteredUsers)
         }
     }
@@ -35,11 +35,4 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-
-
-    fun getAllUsers() {
-        viewModelScope.launch {
-            _users.postValue(userDao.getAllUsers())
-        }
-    }
 }

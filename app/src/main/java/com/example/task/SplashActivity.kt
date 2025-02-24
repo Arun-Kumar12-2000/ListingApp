@@ -27,12 +27,12 @@ class SplashActivity : AppCompatActivity() {
 
         // Initialize GPS location request
         locationRequest = LocationRequest.Builder(
-            Priority.PRIORITY_HIGH_ACCURACY, 10000 // 10-second interval
+            Priority.PRIORITY_HIGH_ACCURACY, 10000
         ).build()
 
         locationSettingsRequest = LocationSettingsRequest.Builder()
             .addLocationRequest(locationRequest)
-            .setAlwaysShow(true) // Always show GPS enable popup
+            .setAlwaysShow(true)
             .build()
 
         settingsClient = LocationServices.getSettingsClient(this)
@@ -44,13 +44,12 @@ class SplashActivity : AppCompatActivity() {
     private fun checkGPSAndProceed() {
         settingsClient.checkLocationSettings(locationSettingsRequest)
             .addOnSuccessListener {
-                // GPS is already enabled, proceed to MainActivity
+                // GPS is already enabled, move to MainActivity
                 navigateToMainActivity()
             }
             .addOnFailureListener { exception ->
                 if (exception is ResolvableApiException) {
                     try {
-                        // Show popup to enable GPS
                         gpsEnableLauncher.launch(
                             IntentSenderRequest.Builder(exception.resolution).build()
                         )
@@ -58,7 +57,6 @@ class SplashActivity : AppCompatActivity() {
                         sendEx.printStackTrace()
                     }
                 } else {
-                    // If GPS is not available at all, still move to MainActivity
                     navigateToMainActivity()
                 }
             }
@@ -78,6 +76,6 @@ class SplashActivity : AppCompatActivity() {
         Handler(Looper.getMainLooper()).postDelayed({
             startActivity(Intent(this, MainActivity::class.java))
             finish()
-        }, 2000) // Delay for 2 seconds before moving to MainActivity
+        }, 2000)
     }
 }

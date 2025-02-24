@@ -69,13 +69,13 @@ class UserAdapter(private val users: MutableList<User>) : RecyclerView.Adapter<U
         users.clear()
         users.addAll(newUsers.map {
             User(
-                gender = "unknown",
+                gender = "",
                 name = Name("", it.firstName, it.lastName),
                 location = Location(
                     street = Street(0, ""),
-                    it.city,           // Fetch city name
-                    it.state,         // Fetch state name
-                    it.country,     // Fetch country name
+                    it.city,
+                    it.state,
+                    it.country,
                     "",
                     coordinates = Coordinates("", ""),
                     timezone = Timezone("", "")
@@ -94,20 +94,7 @@ class UserAdapter(private val users: MutableList<User>) : RecyclerView.Adapter<U
         notifyDataSetChanged()
     }
 
-    fun addUsers(newUsers: List<User>) {
-        val startPosition = users.size
-        users.addAll(newUsers)
-        notifyItemRangeInserted(startPosition, newUsers.size)
-    }
 
     private val userList = mutableListOf<UserTable>()
-
-    fun updateUsers(newUsers: List<UserTable>) {
-        Log.d("LoadData", "Updating adapter with ${newUsers.size} users")
-        userList.clear() // If you need to replace data
-        userList.addAll(newUsers) // Append new data
-        notifyDataSetChanged()
-    }
-
 
 }
