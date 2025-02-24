@@ -185,7 +185,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     private fun showLoadMoreProgress(isLoading: Boolean) {
         binding.progressBarLoadMore.visibility = if (isLoading) View.VISIBLE else View.GONE
     }
@@ -194,9 +193,18 @@ class MainActivity : AppCompatActivity() {
         if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             getCurrentLocation()
         } else {
-            locationPermissionLauncher.launch(ACCESS_FINE_LOCATION)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) { // Android 11+ (API 30+)
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, ACCESS_FINE_LOCATION)) {
+                    showPermissionExplanationDialog()
+                } else {
+                    locationPermissionLauncher.launch(ACCESS_FINE_LOCATION)
+                }
+            } else {
+                locationPermissionLauncher.launch(ACCESS_FINE_LOCATION)
+            }
         }
     }
+
 
     private fun getCurrentLocation() {
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
